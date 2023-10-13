@@ -1,0 +1,129 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+}
+
+body.brush-tool {
+    cursor: url('../images/cursor-brush.svg') 2 16, pointer;
+}
+
+body.eraser-tool {
+    cursor: url('../images/cursor-eraser.svg') 2 16, pointer;
+}
+
+h2 {
+    text-align: center;
+}
+
+#app svg {
+    width: 100%;
+    height: 100%;
+}
+
+#app svg circle {
+    fill: gray;
+    transition: all ease-in-out .4s;
+}
+
+#app svg circle.selected {
+    fill: goldenrod;
+}
+
+#app svg text {
+    text-anchor: middle;
+}
+
+.btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px;
+    padding: 20px 40px;
+    border-radius: 65px;
+    max-width: 250px;
+    width: 100%;
+    background-color: goldenrod;
+    cursor: pointer;
+    font-size: 22px;
+    line-height: 100%;
+    color: ghostwhite;
+    box-shadow: 0 0 15px transparent;
+    transition: all ease-in-out .4s;
+}
+
+.btn:hover {
+    background-color: transparent;
+    color: goldenrod;
+    box-shadow: 0 0 15px goldenrod;
+}
+
+.seats {
+    background-color: #fff;
+    position: fixed;
+    width: 100%;
+    height: 0px;
+    top: 0;
+    left: 0;
+    overflow-y: auto;
+    opacity: 0;
+    overflow: hidden;
+    visibility: hidden;
+    z-index: -1;
+    transition: all ease-in-out .4s;
+}
+
+.seats__wrapper {
+    padding: 50px;
+    position: relative;
+}
+
+.seats__svg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.seats__svg svg {
+    width: 0px;
+    height: 0px;
+    transition: all ease-in-out .4s;
+}
+
+.seats.show {
+    opacity: 1;
+    overflow-y: auto;
+    visibility: visible;
+    z-index: 999;
+    height: 100%;
+}
+
+.seats.show .seats__svg svg {
+    width: 100%;
+    height: 100%; 
+    max-width: fit-content;
+}
+
+.seats__actions {
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+    background-color: darkgray;
+}
+
+.btn-tools {
+    background-color: transparent;
+    border: none;
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    cursor: pointer;
+}
