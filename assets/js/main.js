@@ -1,41 +1,43 @@
 'use strict';
 
-document.addEventListener('DOMContentLoaded', () => {
-    const app = document.getElementById('app');
-    const body = document.querySelector('body');
+$(document).ready(function() {
+    const $app = $('#app')[0];
+    const $body = $('body');
 
-    if (app) {
-        const createElement = (tagName, classes, attributes, content) => {
-            const tag = document.createElement(tagName);
-            tag.classList.add(...classes);
-    
-            if (attributes) {
-                attributes.forEach(attr => {
-                    for (let key in attr) {
-                        tag.setAttribute(key, attr[key]);
-                    }
-                });
+    if ($app) {
+        class createElement {
+            constructor(tagName, classes, attributes, content) {
+                this.$element = $(`<${tagName}></${tagName}>`);
+        
+                if (classes) {
+                    this.$element.addClass(classes.join(' '));
+                }
+        
+                if (attributes) {
+                    $.each(attributes, (key, value) => {
+                        this.$element.attr(key, value);
+                    });
+                }
+        
+                this.$element.html(content || '');
+
+                return this.$element;
             }
-    
-            tag.innerHTML = content || '';
-    
-            return tag;
-        };
+        
+            // getElement() {
+            //     this.$element.get(0);
+            // }
+        }
 
-        const btnShowTicketsArea = createElement('button', ['btn'], [
-            {
-                'type': 'button',
-            },
-        ], 'Show Seats');
+        const $btnShowTicketsArea = new createElement('button', ['btn'], {'type': 'button'}, 'Show Seats');
+        const $modalSeats = new createElement('div', ['seats']);
+        const $modalSeatsContainer = new createElement('div', ['seats__wrapper'])[0];
+        const $seatsContainer = new createElement('div', ['seats__parent'])[0];
+        const $seatsSvg = new createElement('div', ['seats__svg']);
+        const $message = new createElement('h2', ['message'], null, 'You can view tickets information in the console Your order console')[0];
+        let $ticketsOrder = [];
 
-        const modalSeats = createElement('div', ['seats']);
-        const modalSeatsContainer = createElement('div', ['seats__wrapper']);
-        const seatsContainer = createElement('div', ['seats__parent']);
-        const seatsSvg = createElement('div', ['seats__svg']);
-        const message = createElement('h2', ['message'], null, 'You can view tickets information in the console Your order console');
-        let ticketsOrder = [];
-
-        seatsSvg.innerHTML = `
+        $seatsSvg.html(`
             <svg width="1502px" height="1849px" viewBox="0 0 1502 1849" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
                 <defs></defs>
                 <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
@@ -980,14 +982,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     </g>
                 </g>
             </svg>
-        `;
-
-        const modalSeatsActions = createElement('div', ['seats__actions']);
-        const seatsActionBtnSelect = createElement('button', ['btn-tools', 'btn-tools__select'], [
-            {
-                'type': 'button',
-            },
-        ], `
+        `);  
+  
+        const $modalSeatsActions = new createElement('div', ['seats__actions'])[0];
+        const $seatsActionBtnSelect = new createElement('button', ['btn-tools', 'btn-tools__select'], {'type': 'button'}, `
             <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 137.145 137.145" xmlns:xlink="http://www.w3.org/1999/xlink" enable-background="new 0 0 137.145 137.145">
                 <g>
                 <g>
@@ -995,93 +993,82 @@ document.addEventListener('DOMContentLoaded', () => {
                 </g>
                 </g>
             </svg>
-        `);        
-        
-        const seatsActionBtnEraser = createElement('button', ['btn-tools', 'btn-tools__eraser'], [
-            {
-                'type': 'button',
-            },
-        ], `
+        `);
+        const $seatsActionBtnEraser = new createElement('button', ['btn-tools', 'btn-tools__eraser'], {'type': 'button'}, `
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M9 22H15C20 22 22 20 22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 <path d="M6.98994 15.08L8.92993 17.02C9.56993 17.66 10.6299 17.66 11.2699 17.02L17.0199 11.27C17.6599 10.63 17.6599 9.57 17.0199 8.93L15.0799 6.99001C14.4399 6.35001 13.3799 6.35001 12.7399 6.99001L6.98994 12.74C6.33994 13.38 6.33994 14.43 6.98994 15.08Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 <path d="M9.31006 10.4199L13.5801 14.6899" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>        
+            </svg>     
+        `);
+        const $seatsActionBtnTickets = new createElement('button', ['btn-tools', 'btn-tools__tickets'], {'type': 'button'}, `
+            <svg enable-background="new 0 0 32 32" version="1.1" viewBox="0 0 32 32" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="Glyph"><g><rect height="3.319" width="3.327" x="9.418" y="12.229"/><path d="M32,19.485h-0.5c-1.938,0-3.516-1.563-3.516-3.485s1.577-3.486,3.516-3.486H32V6.829H0v5.685h0.5    c1.938,0,3.516,1.564,3.516,3.486S2.439,19.485,0.5,19.485H0v5.686h32V19.485z M8.418,11.229h5.327v5.319H8.418V11.229z     M23.418,20.411H7.834v-1h15.584V20.411z M23.418,16.336h-6.422v-1h6.422V16.336z M23.418,12.26h-6.422v-1h6.422V12.26z"/></g></g></svg>   
         `);
 
-        const seatsActionBtnTickets = createElement('button', ['btn-tools', 'btn-tools__tickets'], [
-            {
-                'type': 'button',
-            },
-        ], `
-            <svg enable-background="new 0 0 32 32" version="1.1" viewBox="0 0 32 32" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="Glyph"><g><rect height="3.319" width="3.327" x="9.418" y="12.229"/><path d="M32,19.485h-0.5c-1.938,0-3.516-1.563-3.516-3.485s1.577-3.486,3.516-3.486H32V6.829H0v5.685h0.5    c1.938,0,3.516,1.564,3.516,3.486S2.439,19.485,0.5,19.485H0v5.686h32V19.485z M8.418,11.229h5.327v5.319H8.418V11.229z     M23.418,20.411H7.834v-1h15.584V20.411z M23.418,16.336h-6.422v-1h6.422V16.336z M23.418,12.26h-6.422v-1h6.422V12.26z"/></g></g></svg> 
-        `);
+        function messageOrder() {
+            $ticketsOrder.length ? $($message).css('display', 'block') : $($message).css('display', 'none');
+        }
 
-        const messageOrder = () => {
-            ticketsOrder.length ? message.style.display = 'block' : message.style.display = 'none';
-        };
-        modalSeatsActions.append(seatsActionBtnSelect, seatsActionBtnEraser, seatsActionBtnTickets);
+        $modalSeatsActions.append($seatsActionBtnSelect[0], $seatsActionBtnEraser[0], $seatsActionBtnTickets[0]);
 
-        seatsContainer.append(seatsSvg);
-        modalSeatsContainer.append(seatsContainer, modalSeatsActions);
-        modalSeats.append(modalSeatsContainer);
-        app.append(btnShowTicketsArea, message, modalSeats);
+        $seatsContainer.append($seatsSvg[0]);
+        $modalSeatsContainer.append($seatsContainer, $modalSeatsActions);
+        $modalSeats.append($modalSeatsContainer);
+        $app.append($btnShowTicketsArea[0], $message, $modalSeats[0]);
 
         messageOrder();
 
         const handlerSelectedTickets = () => {
-            body.addEventListener('click', e => {
-                const target = e.target;
+            $body.on('click', 'circle', function(e) {
 
-                if (target.tagName === 'circle') {                
+                if ($(this).prop('tagName') === 'circle') {
                     let ticket = {
                         id: 0,
                         x: 0,
                         y: 0,
                     };
-
-                    ticket.id = target.id;
-                    ticket.x = e.x;
-                    ticket.y = e.y;
-
-                    if (body.classList.contains('brush-tool') && !target.classList.contains('selected')) {
-                        target.classList.add('selected');
-
-                        ticketsOrder.push(ticket);
+        
+                    ticket.id = $(this).prop('id');
+                    ticket.x = e.pageX;
+                    ticket.y = e.pageY;
+        
+                    if ($body.hasClass('brush-tool') && !$(this).hasClass('selected')) {
+                        $(this).addClass('selected');
+                        $ticketsOrder.push(ticket);
                     }
-
-                    if (body.classList.contains('eraser-tool') && target.classList.contains('selected')) {
-                        target.classList.remove('selected');
-
-                        let newTicketsOrder = ticketsOrder.filter((item) => item.id !== ticket.id);
-
-                        ticketsOrder = newTicketsOrder;
+        
+                    if ($body.hasClass('eraser-tool') && $(this).hasClass('selected')) {
+                        $(this).removeClass('selected');
+        
+                        let newTicketsOrder = $ticketsOrder.filter((item) => item.id !== ticket.id);
+                        $ticketsOrder = newTicketsOrder;
                     }
                 }
             });
-        };     
+        };
+        
+        
 
-        btnShowTicketsArea.addEventListener('click', () => {
-            modalSeats.classList.add('show');
-
+        $btnShowTicketsArea.click(function() {
+            $modalSeats.first().addClass('show');
             handlerSelectedTickets();
         });
 
-        seatsActionBtnSelect.addEventListener('click', () => {
-            body.classList = 'brush-tool';
+        $seatsActionBtnSelect.click(function() {
+            $body.removeClass().addClass('brush-tool');
         });
-
-        seatsActionBtnEraser.addEventListener('click', () => {
-            body.classList = 'eraser-tool';
+        
+        $seatsActionBtnEraser.click(function() {
+            $body.removeClass().addClass('eraser-tool');
         });
-
-        seatsActionBtnTickets.addEventListener('click', () => {
-            body.classList = '';
-            modalSeats.classList.remove('show');
-            
+        
+        $seatsActionBtnTickets.click(function() {
+            $body.removeClass();
+            $modalSeats.first().removeClass('show');
+        
             messageOrder();
-
-            console.log(ticketsOrder);
-        });
+        
+            console.log($ticketsOrder);
+        });        
     }
 });
